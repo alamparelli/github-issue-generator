@@ -1,0 +1,21 @@
+{
+  "name": "github-issue-generator",
+  "version": "1.0.0",
+  "description": "A Node.js script to generate GitHub issues from a markdown file",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [
+    "github",
+    "issues",
+    "markdown",
+    "automation"
+  ],
+  "author": "Alessandro LAMPARELLI",
+  "license": "MIT",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "dotenv": "^10.0.0"
+  }
+}
