@@ -1,11 +1,16 @@
 require('dotenv').config();
+const express = require('express');
 const fs = require('fs');
 const axios = require('axios');
+const path = require('path');
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 
-// Function to read markdown file
-function readMarkdownFile(filePath) {
-  return fs.readFileSync(filePath, 'utf8');
-}
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.static(path.join(__dirname, '.')));
+app.use(express.json());
 
 // Function to parse markdown content into issues
 function parseMarkdownToIssues(content) {
@@ -32,40 +37,50 @@ function parseMarkdownToIssues(content) {
 }
 
 // Function to create GitHub issues
-async function createGitHubIssues(issues) {
-  const url = `https://api.github.com/repos/${process.env.GITHUB_REPO_OWNER}/${process.env.GITHUB_REPO_NAME}/issues`;
+async function createGitHubIssues(issues, token, owner, repo) {
+  const url = `https://api.github.com/repos/${owner}/${repo}/issues`;
   const headers = {
-    'Authorization': `token ${process.env.GITHUB_TOKEN}`,
+    'Authorization': `token ${token}`,
     'Accept': 'application/vnd.github.v3+json'
   };
+
+  const createdIssues = [];
 
   for (const issue of issues) {
     try {
       const response = await axios.post(url, issue, { headers });
-      console.log(`Created issue: ${response.data.html_url}`);
+      createdIssues.push(`Created issue: ${response.data.html_url}`);
     } catch (error) {
-      console.error(`Error creating issue: ${error.message}`);
+      createdIssues.push(`Error creating issue: ${error.message}`);
     }
   }
+
+  return createdIssues;
 }
 
-// Main function
-async function main() {
-  const filePath = process.argv[2];
+app.post('/generate', upload.single('markdownFile'), async (req, res) => {
+  const { githubToken, repoOwner, repoName } = req.body;
+  const markdownFile = req.file;
 
-  if (!filePath) {
-    console.error('Usage: node index.js <markdown_file>');
-    process.exit(1);
+  if (!githubToken || !repoOwner || !repoName || !markdownFile) {
+    return res.status(400).send('Missing required parameters');
   }
 
-  if (!process.env.GITHUB_REPO_OWNER || !process.env.GITHUB_REPO_NAME || !process.env.GITHUB_TOKEN) {
-    console.error('Please ensure all required environment variables are set in the .env file');
-    process.exit(1);
+  try {
+    const markdownContent = fs.readFileSync(markdownFile.path, 'utf8');
+    const issues = parseMarkdownToIssues(markdownContent);
+    const result = await createGitHubIssues(issues, githubToken, repoOwner, repoName);
+
+    // Clean up the uploaded file
+    fs.unlinkSync(markdownFile.path);
+
+    res.send(result.join('\n'));
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('An error occurred while generating issues');
   }
+});
 
-  const markdownContent = readMarkdownFile(filePath);
-  const issues = parseMarkdownToIssues(markdownContent);
-  await createGitHubIssues(issues);
-}
-
-main().catch(console.error);
+app.listen(port, () => {
+  console.log(`Server running at http://localhost:${port}`);
+});
