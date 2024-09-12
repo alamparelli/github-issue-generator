@@ -1,6 +1,6 @@
 # GitHub Issue Generator
 
-This Node.js script generates GitHub issues from a markdown file. Each top-level heading (# ) in the markdown file becomes a new issue title, and the content below it becomes the issue body.
+This application generates GitHub issues from a markdown file. Each top-level heading (# ) in the markdown file becomes a new issue title, and the content below it becomes the issue body. It now features both a command-line interface and a web interface for ease of use.
 
 ## Prerequisites
 
@@ -22,7 +22,7 @@ This Node.js script generates GitHub issues from a markdown file. Each top-level
    npm install
    ```
 
-3. Create a `.env` file in the root directory of the project and add your GitHub configuration:
+3. Create a `.env` file in the root directory of the project and add your GitHub configuration (for command-line usage):
 
    ```
    GITHUB_REPO_OWNER=your_github_username
@@ -33,6 +33,28 @@ This Node.js script generates GitHub issues from a markdown file. Each top-level
    Replace the values with your actual GitHub username, repository name, and personal access token.
 
 ## Usage
+
+### Web Interface
+
+1. Start the server:
+
+   ```
+   node index.js
+   ```
+
+2. Open your web browser and navigate to `http://localhost:3000`.
+
+3. Fill in the form with the following information:
+   - GitHub Token: Your GitHub personal access token
+   - Repository Owner: Your GitHub username or organization name
+   - Repository Name: The name of the repository where you want to create issues
+   - Markdown File: Upload a markdown file containing the issues you want to create
+
+4. Click the "Generate Issues" button to create the issues.
+
+5. The results will be displayed on the page, showing links to the created issues or any errors encountered.
+
+### Command-line Interface
 
 Run the script with the following command:
 
@@ -67,6 +89,13 @@ Issue body 3
 ```
 
 Each top-level heading (# ) will create a new issue. The heading text becomes the issue title, and everything between headings becomes the issue body.
+
+## Features
+
+- Web interface for easy issue generation without using the command line
+- Command-line interface for scriptable issue generation
+- Supports multiple issues per markdown file
+- Automatically creates GitHub issues with titles and descriptions
 
 ## License
 
