@@ -12,7 +12,7 @@ This application generates GitHub issues from a markdown file. Each top-level he
 1. Clone this repository:
 
    ```
-   git clone https://github.com/yourusername/github-issue-generator.git
+   git clone https://github.com/alamparelli/github-issue-generator.git
    cd github-issue-generator
    ```
 
